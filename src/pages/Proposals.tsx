@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { getToken, getUserType, logout } from "@/lib/api";
 
@@ -16,6 +17,7 @@ interface Candidate {
 const Proposals = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Candidate | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,7 +63,11 @@ const Proposals = () => {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {candidates.map((c) => (
-              <Card key={c.id}>
+              <Card
+                key={c.id}
+                className="cursor-pointer transition-transform hover:scale-105"
+                onClick={() => setSelected(c)}
+              >
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={c.photo_url || undefined} alt={c.name} />
@@ -70,13 +76,30 @@ const Proposals = () => {
                   <CardTitle className="text-lg">{c.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{c.bio || "Sin biografía disponible."}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-3">{c.bio || "Sin biografía disponible."}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
       </main>
+
+      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="max-w-lg">
+          {selected && (
+            <div className="flex flex-col items-center gap-4 pt-4">
+              <Avatar className="h-28 w-28">
+                <AvatarImage src={selected.photo_url || undefined} alt={selected.name} />
+                <AvatarFallback className="text-3xl">{selected.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <h2 className="text-xl font-bold text-center">{selected.name}</h2>
+              <p className="text-sm text-muted-foreground text-center whitespace-pre-line">
+                {selected.bio || "Sin biografía disponible."}
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
