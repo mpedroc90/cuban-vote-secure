@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
         .single();
 
       if (error || !member) {
-        return new Response(JSON.stringify({ error: "Credenciales inválidas" }), {
+        return new Response(JSON.stringify({ error: "Entre su cárnet de identidad o el código de admisión correcto " }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
