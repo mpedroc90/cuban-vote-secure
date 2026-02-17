@@ -48,12 +48,6 @@ Deno.serve(async (req) => {
         });
       }
 
-      if (member.fee_status !== "paid") {
-        return new Response(JSON.stringify({ error: "Su membresía no está al día. Contacte a la sociedad." }), {
-          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
       // Generate session token
       const token = crypto.randomUUID() + "-" + crypto.randomUUID();
       const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000); // 4 hours
