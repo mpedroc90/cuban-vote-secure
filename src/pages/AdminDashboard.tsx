@@ -44,6 +44,8 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [newCandidate, setNewCandidate] = useState({ name: "", bio: "", photo_url: "" });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [csvText, setCsvText] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -101,12 +103,33 @@ const AdminDashboard = () => {
       return;
     }
     try {
-      await adminAction("add-candidate", newCandidate);
+      setUploading(true);
+      let photo_url = newCandidate.photo_url;
+
+      if (photoFile) {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(photoFile);
+        });
+        const result = await adminAction("upload-photo", {
+          file_base64: base64,
+          file_name: photoFile.name,
+          content_type: photoFile.type,
+        });
+        photo_url = result.url;
+      }
+
+      await adminAction("add-candidate", { name: newCandidate.name, bio: newCandidate.bio, photo_url });
       setNewCandidate({ name: "", bio: "", photo_url: "" });
+      setPhotoFile(null);
       toast({ title: "Éxito", description: "Candidato agregado" });
       loadData();
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -256,15 +279,34 @@ const AdminDashboard = () => {
                     <Input value={newCandidate.name} onChange={e => setNewCandidate(p => ({ ...p, name: e.target.value }))} maxLength={100} />
                   </div>
                   <div className="space-y-1">
-                    <Label>URL de Foto</Label>
-                    <Input value={newCandidate.photo_url} onChange={e => setNewCandidate(p => ({ ...p, photo_url: e.target.value }))} maxLength={500} />
+                    <Label>Foto</Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files?.[0] || null;
+                        setPhotoFile(file);
+                        if (file) setNewCandidate(p => ({ ...p, photo_url: "" }));
+                      }}
+                    />
+                    {!photoFile && (
+                      <Input
+                        value={newCandidate.photo_url}
+                        onChange={e => setNewCandidate(p => ({ ...p, photo_url: e.target.value }))}
+                        placeholder="O pegue URL de foto"
+                        maxLength={500}
+                        className="mt-1"
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="space-y-1">
                   <Label>Biografía</Label>
                   <Textarea value={newCandidate.bio} onChange={e => setNewCandidate(p => ({ ...p, bio: e.target.value }))} maxLength={1000} />
                 </div>
-                <Button onClick={handleAddCandidate}>Agregar</Button>
+                <Button onClick={handleAddCandidate} disabled={uploading}>
+                  {uploading ? "Subiendo..." : "Agregar"}
+                </Button>
               </CardContent>
             </Card>
 
