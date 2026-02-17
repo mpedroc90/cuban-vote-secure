@@ -185,8 +185,13 @@ Deno.serve(async (req) => {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const { error } = await supabase.from("members").delete().in("id", member_ids);
-      if (error) throw error;
+      // Batch deletes in chunks of 100 to avoid request size limits
+      const chunkSize = 100;
+      for (let i = 0; i < member_ids.length; i += chunkSize) {
+        const chunk = member_ids.slice(i, i + chunkSize);
+        const { error } = await supabase.from("members").delete().in("id", chunk);
+        if (error) throw error;
+      }
       return new Response(JSON.stringify({ success: true, deleted: member_ids.length }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
