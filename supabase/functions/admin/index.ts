@@ -83,6 +83,25 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "upload-photo") {
+      const { file_base64, file_name, content_type } = params;
+      if (!file_base64 || !file_name) {
+        return new Response(JSON.stringify({ error: "Archivo requerido" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const bytes = Uint8Array.from(atob(file_base64), c => c.charCodeAt(0));
+      const path = `${crypto.randomUUID()}-${file_name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("candidate-photos")
+        .upload(path, bytes, { contentType: content_type || "image/jpeg", upsert: false });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("candidate-photos").getPublicUrl(path);
+      return new Response(JSON.stringify({ url: urlData.publicUrl }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "add-candidate") {
       const { name, bio, photo_url } = params;
       const { data, error } = await supabase
