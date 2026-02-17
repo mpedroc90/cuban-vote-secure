@@ -178,6 +178,20 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "delete-members") {
+      const { member_ids } = params;
+      if (!Array.isArray(member_ids) || member_ids.length === 0) {
+        return new Response(JSON.stringify({ error: "Debe seleccionar al menos un miembro" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { error } = await supabase.from("members").delete().in("id", member_ids);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, deleted: member_ids.length }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // --- Stats ---
     if (action === "get-stats") {
       const { data: members } = await supabase.from("members").select("id, has_voted, fee_status");

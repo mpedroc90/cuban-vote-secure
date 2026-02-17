@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +40,7 @@ interface Stats {
 const AdminDashboard = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [newCandidate, setNewCandidate] = useState({ name: "", bio: "", photo_url: "" });
@@ -63,6 +65,7 @@ const AdminDashboard = () => {
       ]);
       setCandidates(candidatesData || []);
       setMembers(membersData || []);
+      setSelectedMembers(new Set());
       setStats(statsData);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -287,10 +290,42 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="members">
+            {selectedMembers.size > 0 && (
+              <div className="mb-4 flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">{selectedMembers.size} seleccionado(s)</span>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={async () => {
+                    if (!confirm(`¿Eliminar ${selectedMembers.size} miembro(s)? Esta acción no se puede deshacer.`)) return;
+                    try {
+                      await adminAction("delete-members", { member_ids: Array.from(selectedMembers) });
+                      toast({ title: "Éxito", description: `${selectedMembers.size} miembro(s) eliminado(s)` });
+                      loadData();
+                    } catch (err: any) {
+                      toast({ title: "Error", description: err.message, variant: "destructive" });
+                    }
+                  }}
+                >
+                  Eliminar Seleccionados
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setSelectedMembers(new Set())}>
+                  Deseleccionar
+                </Button>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="border-b">
+                    <th className="p-2 text-center w-10">
+                      <Checkbox
+                        checked={members.length > 0 && selectedMembers.size === members.length}
+                        onCheckedChange={(checked) => {
+                          setSelectedMembers(checked ? new Set(members.map(m => m.id)) : new Set());
+                        }}
+                      />
+                    </th>
                     <th className="p-2 text-left">Número</th>
                     <th className="p-2 text-left">Nombre</th>
                     <th className="p-2 text-center">Estado</th>
@@ -301,6 +336,18 @@ const AdminDashboard = () => {
                 <tbody>
                   {members.map(m => (
                     <tr key={m.id} className="border-b">
+                      <td className="p-2 text-center">
+                        <Checkbox
+                          checked={selectedMembers.has(m.id)}
+                          onCheckedChange={(checked) => {
+                            setSelectedMembers(prev => {
+                              const next = new Set(prev);
+                              checked ? next.add(m.id) : next.delete(m.id);
+                              return next;
+                            });
+                          }}
+                        />
+                      </td>
                       <td className="p-2">{m.member_number}</td>
                       <td className="p-2">{m.name}</td>
                       <td className="p-2 text-center">
