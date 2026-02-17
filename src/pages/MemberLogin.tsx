@@ -30,6 +30,7 @@ const MemberLogin = () => {
         navigate("/propuestas");
       }
     } catch (err: any) {
+      console.log(err)
       toast({ title: "Error de acceso", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
