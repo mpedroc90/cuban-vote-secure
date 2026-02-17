@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { adminLogin } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -36,6 +37,9 @@ const AdminLogin = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img src={logo} alt="Sociedad Cubana de Psicología" className="h-24 w-auto" />
+          </div>
           <CardTitle className="text-2xl">Comisión Electoral</CardTitle>
           <CardDescription>Panel de Administración</CardDescription>
         </CardHeader>
