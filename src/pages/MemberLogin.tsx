@@ -31,7 +31,7 @@ const MemberLogin = () => {
       }
     } catch (err: any) {
       console.log(err)
-      toast({ title: "Error de acceso", description: err.message, variant: "destructive" });
+      toast({ title: "Error de acceso", description: "Compruebe su número de miembro y su carnet de identidad.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
