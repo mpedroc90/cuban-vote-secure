@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
         .single();
 
       if (error || !member) {
-        return new Response(JSON.stringify({ error: "Entre su cárnet de identidad o el código de admisión correcto " }), {
+        return new Response(JSON.stringify({ error: `Compruebe su número de miembro y su carnet de identidad.\nAdemás compruebe que su membresía se encuentre actualizada.` }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
