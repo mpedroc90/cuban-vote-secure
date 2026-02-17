@@ -40,6 +40,8 @@ Deno.serve(async (req) => {
         .eq("id_card_hash", idCardHash)
         .single();
 
+        console.log(member, error);
+
       if (error || !member) {
         return new Response(JSON.stringify({ error: `Compruebe su número de miembro y su carnet de identidad.` }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
