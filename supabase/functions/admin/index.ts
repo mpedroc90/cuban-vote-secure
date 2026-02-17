@@ -161,7 +161,7 @@ Deno.serve(async (req) => {
           const idCard = String(m.id_card || m.carnet || m.carné || "").trim();
           const memberNumber = String(m.member_number || m.numero_miembro || m.número_miembro || "").trim();
           const name = String(m.name || m.nombre || "").trim();
-          const feeStatus = (m.fee_status || m.estado || m.cuota || "").toString().toLowerCase();
+    
 
           if (!idCard || !memberNumber || !name) {
             results.errors.push(`Fila con datos incompletos: ${memberNumber || "sin número"}`);
@@ -173,13 +173,11 @@ Deno.serve(async (req) => {
           const hashArray = Array.from(new Uint8Array(hashBuffer));
           const idCardHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-          const status = ["paid", "pagado", "al día", "al dia", "si", "sí", "yes", "1", "true"].includes(feeStatus) ? "paid" : "pending";
-
           const { error } = await supabase.from("members").upsert({
             member_number: memberNumber,
             id_card_hash: idCardHash,
             name,
-            fee_status: status,
+            fee_status: "paid",
           }, { onConflict: "member_number" });
 
           if (error) {
