@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ const AdminDashboard = () => {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [csvText, setCsvText] = useState("");
+  const [importProgress, setImportProgress] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -151,20 +153,36 @@ const AdminDashboard = () => {
     try {
       const lines = csvText.trim().split("\n");
       const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
-      const members = lines.slice(1).map(line => {
+      const allMembers = lines.slice(1).map(line => {
         const values = line.split(",").map(v => v.trim());
         const obj: any = {};
         headers.forEach((h, i) => { obj[h] = values[i]; });
         return obj;
       });
-      const result = await adminAction("import-members", { members });
+
+      const batchSize = 50;
+      let totalImported = 0;
+      let totalErrors: string[] = [];
+      setImportProgress(0);
+
+      for (let i = 0; i < allMembers.length; i += batchSize) {
+        const batch = allMembers.slice(i, i + batchSize);
+        const result = await adminAction("import-members", { members: batch });
+        totalImported += result.imported || 0;
+        if (result.errors?.length) totalErrors.push(...result.errors);
+        setImportProgress(Math.round(((i + batch.length) / allMembers.length) * 100));
+      }
+
+      setImportProgress(100);
       toast({
         title: "Importación completada",
-        description: `${result.imported} miembros importados. ${result.errors?.length || 0} errores.`,
+        description: `${totalImported} miembros importados. ${totalErrors.length} errores.`,
       });
       setCsvText("");
+      setTimeout(() => setImportProgress(null), 2000);
       loadData();
     } catch (err: any) {
+      setImportProgress(null);
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
@@ -425,7 +443,12 @@ const AdminDashboard = () => {
                   placeholder="numero_miembro,carnet,nombre,estado&#10;001,12345678901,Juan Pérez,pagado&#10;002,98765432101,María García,pendiente"
                   rows={10}
                 />
-                <Button onClick={handleImportCSV}>Importar</Button>
+                <Button onClick={handleImportCSV} disabled={importProgress !== null}>
+                  {importProgress !== null ? `Importando... ${importProgress}%` : "Importar"}
+                </Button>
+                {importProgress !== null && (
+                  <Progress value={importProgress} className="mt-2" />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
