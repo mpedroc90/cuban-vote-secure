@@ -85,15 +85,15 @@ const Proposals = () => {
       </main>
 
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           {selected && (
             <div className="flex flex-col items-center gap-4 pt-4">
-              <Avatar className="h-28 w-28">
+              <Avatar className="h-28 w-28 shrink-0">
                 <AvatarImage src={selected.photo_url || undefined} alt={selected.name} />
                 <AvatarFallback className="text-3xl">{selected.name.slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <h2 className="text-xl font-bold text-center">{selected.name}</h2>
-              <p className="text-sm text-muted-foreground text-center whitespace-pre-line">
+              <p className="text-sm text-muted-foreground text-center whitespace-pre-line break-words">
                 {selected.bio || "Sin biografía disponible."}
               </p>
             </div>
