@@ -302,7 +302,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="space-y-1">
                   <Label>Biografía</Label>
-                  <Textarea value={newCandidate.bio} onChange={e => setNewCandidate(p => ({ ...p, bio: e.target.value }))} maxLength={1000} />
+                  <Textarea value={newCandidate.bio} onChange={e => setNewCandidate(p => ({ ...p, bio: e.target.value }))} rows={6} />
                 </div>
                 <Button onClick={handleAddCandidate} disabled={uploading}>
                   {uploading ? "Subiendo..." : "Agregar"}
