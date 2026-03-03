@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { getToken, getUser, getUserType, submitVote } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -210,16 +211,33 @@ const Voting = () => {
                       )}
                     </td>
                     <td className="p-3 text-center">
-                      <input
-                        type="radio"
-                        name="president"
-                        checked={isPresident}
-                        disabled={!c.eligible_for_president}
-                        onChange={() => {
-                          setPresidentId(c.id);
-                        }}
-                        className="h-4 w-4 accent-primary disabled:opacity-30"
-                      />
+                      {!c.eligible_for_president ? (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex items-center justify-center">
+                                <input
+                                  type="radio"
+                                  name="president"
+                                  disabled
+                                  className="h-4 w-4 accent-primary opacity-30 cursor-not-allowed"
+                                />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs text-center">
+                              <p>No elegible para Presidencia: se requieren al menos 5 años de ejercicio profesional. Puede ser elegido como miembro según estatutos.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <input
+                          type="radio"
+                          name="president"
+                          checked={isPresident}
+                          onChange={() => setPresidentId(c.id)}
+                          className="h-4 w-4 accent-primary"
+                        />
+                      )}
                     </td>
                     <td className="p-3 text-center">
                       <Checkbox
