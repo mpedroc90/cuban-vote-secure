@@ -39,6 +39,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string
+          eligible_for_president: boolean
           id: string
           member_votes: number
           name: string
@@ -48,6 +49,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string
+          eligible_for_president?: boolean
           id?: string
           member_votes?: number
           name: string
@@ -57,6 +59,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string
+          eligible_for_president?: boolean
           id?: string
           member_votes?: number
           name?: string

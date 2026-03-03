@@ -81,11 +81,19 @@ Deno.serve(async (req) => {
     const allIds = [president_id, ...member_ids];
     const { data: candidates } = await supabase
       .from("candidates")
-      .select("id")
+      .select("id, eligible_for_president")
       .in("id", allIds);
 
     if (!candidates || candidates.length !== new Set(allIds).size) {
       return new Response(JSON.stringify({ error: "Candidatos inválidos" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate president is eligible
+    const presidentCandidate = candidates.find((c: any) => c.id === president_id);
+    if (!presidentCandidate?.eligible_for_president) {
+      return new Response(JSON.stringify({ error: "El candidato seleccionado no es elegible para presidente" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

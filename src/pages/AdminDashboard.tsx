@@ -20,6 +20,7 @@ interface Candidate {
   photo_url: string | null;
   president_votes: number;
   member_votes: number;
+  eligible_for_president: boolean;
 }
 
 interface Member {
@@ -44,7 +45,7 @@ const AdminDashboard = () => {
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newCandidate, setNewCandidate] = useState({ name: "", bio: "", photo_url: "" });
+  const [newCandidate, setNewCandidate] = useState({ name: "", bio: "", photo_url: "", eligible_for_president: true });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [csvText, setCsvText] = useState("");
@@ -123,8 +124,8 @@ const AdminDashboard = () => {
         photo_url = result.url;
       }
 
-      await adminAction("add-candidate", { name: newCandidate.name, bio: newCandidate.bio, photo_url });
-      setNewCandidate({ name: "", bio: "", photo_url: "" });
+      await adminAction("add-candidate", { name: newCandidate.name, bio: newCandidate.bio, photo_url, eligible_for_president: newCandidate.eligible_for_president });
+      setNewCandidate({ name: "", bio: "", photo_url: "", eligible_for_president: true });
       setPhotoFile(null);
       toast({ title: "Éxito", description: "Candidato agregado" });
       loadData();
@@ -322,6 +323,14 @@ const AdminDashboard = () => {
                   <Label>Biografía</Label>
                   <Textarea value={newCandidate.bio} onChange={e => setNewCandidate(p => ({ ...p, bio: e.target.value }))} rows={6} />
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="eligible-president"
+                    checked={newCandidate.eligible_for_president}
+                    onCheckedChange={(checked) => setNewCandidate(p => ({ ...p, eligible_for_president: checked === true }))}
+                  />
+                  <Label htmlFor="eligible-president">Elegible para Presidente</Label>
+                </div>
                 <Button onClick={handleAddCandidate} disabled={uploading}>
                   {uploading ? "Subiendo..." : "Agregar"}
                 </Button>
@@ -334,7 +343,12 @@ const AdminDashboard = () => {
                 <Card key={c.id}>
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
-                      <p className="font-medium">{c.name}</p>
+                      <p className="font-medium">
+                        {c.name}
+                        {!c.eligible_for_president && (
+                          <Badge variant="secondary" className="ml-2 text-xs">Solo Miembro</Badge>
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground">{c.bio?.slice(0, 80)}...</p>
                       {stats?.config.results_revealed && (
                         <p className="text-sm mt-1">

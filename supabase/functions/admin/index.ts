@@ -103,10 +103,10 @@ Deno.serve(async (req) => {
     }
 
     if (action === "add-candidate") {
-      const { name, bio, photo_url } = params;
+      const { name, bio, photo_url, eligible_for_president } = params;
       const { data, error } = await supabase
         .from("candidates")
-        .insert({ name, bio, photo_url })
+        .insert({ name, bio, photo_url, eligible_for_president: eligible_for_president !== false })
         .select()
         .single();
       if (error) throw error;
@@ -116,10 +116,12 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update-candidate") {
-      const { id, name, bio, photo_url } = params;
+      const { id, name, bio, photo_url, eligible_for_president } = params;
+      const updateData: any = { name, bio, photo_url };
+      if (typeof eligible_for_president === "boolean") updateData.eligible_for_president = eligible_for_president;
       const { data, error } = await supabase
         .from("candidates")
-        .update({ name, bio, photo_url })
+        .update(updateData)
         .eq("id", id)
         .select()
         .single();
