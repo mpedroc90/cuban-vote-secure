@@ -13,6 +13,7 @@ interface Candidate {
   id: string;
   name: string;
   photo_url: string | null;
+  eligible_for_president: boolean;
 }
 
 const Voting = () => {
@@ -40,7 +41,7 @@ const Voting = () => {
   }, []);
 
   const loadCandidates = async () => {
-    const { data } = await supabase.from("candidates").select("id, name, photo_url").order("name");
+    const { data } = await supabase.from("candidates").select("id, name, photo_url, eligible_for_president").order("name");
     setCandidates(data || []);
     setLoading(false);
   };
@@ -193,17 +194,22 @@ const Voting = () => {
                 const isMember = memberIds.has(c.id) || isPresident;
                 return (
                   <tr key={c.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3 font-medium">{c.name}</td>
+                    <td className="p-3 font-medium">
+                      {c.name}
+                      {!c.eligible_for_president && (
+                        <span className="ml-2 text-xs text-muted-foreground">(Solo miembro)</span>
+                      )}
+                    </td>
                     <td className="p-3 text-center">
                       <input
                         type="radio"
                         name="president"
                         checked={isPresident}
+                        disabled={!c.eligible_for_president}
                         onChange={() => {
                           setPresidentId(c.id);
-                          // Auto-add as member if not already
                         }}
-                        className="h-4 w-4 accent-primary"
+                        className="h-4 w-4 accent-primary disabled:opacity-30"
                       />
                     </td>
                     <td className="p-3 text-center">

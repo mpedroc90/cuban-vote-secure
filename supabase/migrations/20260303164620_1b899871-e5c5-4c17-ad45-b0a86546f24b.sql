@@ -1,0 +1,1 @@
+ALTER TABLE public.candidates ADD COLUMN eligible_for_president boolean NOT NULL DEFAULT true;
