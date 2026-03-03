@@ -179,6 +179,15 @@ const Voting = () => {
       </header>
 
       <main className="mx-auto max-w-4xl p-4">
+        <div className="mb-6 rounded-lg border bg-muted/40 p-4 space-y-2">
+          <h2 className="font-semibold text-base">📋 Instrucciones de votación</h2>
+          <ol className="list-decimal pl-5 text-sm text-muted-foreground space-y-1">
+            <li><strong>Seleccione un Presidente:</strong> Marque el botón de radio en la columna "Presidente" junto al candidato de su preferencia. Solo los candidatos elegibles pueden ser seleccionados como presidente.</li>
+            <li><strong>Seleccione hasta 10 miembros adicionales:</strong> Marque las casillas en la columna "Miembro" para elegir hasta 10 candidatos adicionales. El presidente seleccionado se incluye automáticamente como miembro.</li>
+            <li>Cuando esté listo, presione <strong>"Continuar al Código de Ética"</strong> para avanzar.</li>
+          </ol>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
