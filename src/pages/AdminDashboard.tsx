@@ -194,7 +194,7 @@ const AdminDashboard = () => {
   const [resetPin, setResetPin] = useState("");
   const [resetPinError, setResetPinError] = useState("");
 
-  const RESET_PIN = "1234";
+  const RESET_PIN = "0112";
 
   const handleResetVotes = () => {
     setResetPin("");
