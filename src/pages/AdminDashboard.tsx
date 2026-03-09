@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { getToken, getUserType, logout, adminAction } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -188,8 +190,25 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleResetVotes = async () => {
-    if (!confirm("¿Está seguro de reiniciar todos los votos? Esta acción no se puede deshacer.")) return;
+  const [showResetPinDialog, setShowResetPinDialog] = useState(false);
+  const [resetPin, setResetPin] = useState("");
+  const [resetPinError, setResetPinError] = useState("");
+
+  const RESET_PIN = "1234";
+
+  const handleResetVotes = () => {
+    setResetPin("");
+    setResetPinError("");
+    setShowResetPinDialog(true);
+  };
+
+  const confirmResetWithPin = async () => {
+    if (resetPin !== RESET_PIN) {
+      setResetPinError("PIN incorrecto. Intente de nuevo.");
+      setResetPin("");
+      return;
+    }
+    setShowResetPinDialog(false);
     try {
       await adminAction("reset-votes");
       toast({ title: "Éxito", description: "Votos reiniciados" });
@@ -468,6 +487,34 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+      {/* Reset PIN Dialog */}
+      <Dialog open={showResetPinDialog} onOpenChange={setShowResetPinDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Reinicio de Votos</DialogTitle>
+            <DialogDescription>
+              Ingrese el PIN de 4 dígitos para confirmar el reinicio. Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <InputOTP maxLength={4} value={resetPin} onChange={(val) => { setResetPin(val); setResetPinError(""); }}>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+              </InputOTPGroup>
+            </InputOTP>
+            {resetPinError && (
+              <p className="text-sm text-destructive font-medium">{resetPinError}</p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowResetPinDialog(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmResetWithPin} disabled={resetPin.length !== 4}>Confirmar Reinicio</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
