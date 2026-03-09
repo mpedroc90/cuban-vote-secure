@@ -206,9 +206,6 @@ const Voting = () => {
                   <tr key={c.id} className="border-b hover:bg-muted/50">
                     <td className="p-3 font-medium">
                       {c.name}
-                      {!c.eligible_for_president && (
-                        <span className="ml-2 text-xs text-muted-foreground">(Solo miembro)</span>
-                      )}
                     </td>
                     <td className="p-3 text-center">
                       {!c.eligible_for_president ? (

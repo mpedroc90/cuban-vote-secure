@@ -389,9 +389,6 @@ const AdminDashboard = () => {
                     <div>
                       <p className="font-medium">
                         {c.name}
-                        {!c.eligible_for_president && (
-                          <Badge variant="secondary" className="ml-2 text-xs">Solo Miembro</Badge>
-                        )}
                       </p>
                       <p className="text-xs text-muted-foreground">{c.bio?.slice(0, 80)}...</p>
                       {stats?.config.results_revealed && (
