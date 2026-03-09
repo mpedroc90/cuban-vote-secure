@@ -38,6 +38,8 @@ interface Stats {
   total: number;
   eligible: number;
   voted: number;
+  ethicsYes: number;
+  ethicsNo: number;
   config: { is_open: boolean; results_revealed: boolean };
 }
 
