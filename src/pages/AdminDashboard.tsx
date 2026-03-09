@@ -475,7 +475,7 @@ const AdminDashboard = () => {
                       </td>
                       <td className="p-2 text-center">{m.has_voted ? "✓" : "—"}</td>
                       <td className="p-2 text-center">
-                        {m.ethics_accepted === null ? "—" : m.ethics_accepted ? "Sí" : "No"}
+                        {m.ethics_accepted !== null ? "✓" : "—"}
                       </td>
                     </tr>
                   ))}
