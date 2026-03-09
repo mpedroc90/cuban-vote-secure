@@ -218,14 +218,16 @@ Deno.serve(async (req) => {
 
     // --- Stats ---
     if (action === "get-stats") {
-      const { data: members } = await supabase.from("members").select("id, has_voted, fee_status");
+      const { data: members } = await supabase.from("members").select("id, has_voted, fee_status, ethics_accepted");
       const total = members?.length || 0;
       const eligible = members?.filter((m: any) => m.fee_status === "paid").length || 0;
       const voted = members?.filter((m: any) => m.has_voted).length || 0;
+      const ethicsYes = members?.filter((m: any) => m.ethics_accepted === true).length || 0;
+      const ethicsNo = members?.filter((m: any) => m.ethics_accepted === false).length || 0;
 
       const { data: config } = await supabase.from("election_config").select("*").single();
 
-      return new Response(JSON.stringify({ total, eligible, voted, config }), {
+      return new Response(JSON.stringify({ total, eligible, voted, ethicsYes, ethicsNo, config }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

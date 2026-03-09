@@ -38,6 +38,8 @@ interface Stats {
   total: number;
   eligible: number;
   voted: number;
+  ethicsYes: number;
+  ethicsNo: number;
   config: { is_open: boolean; results_revealed: boolean };
 }
 
@@ -277,6 +279,29 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Ethics Stats */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Código de Ética — Resultados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">{stats?.ethicsYes || 0}</p>
+                <p className="text-sm text-muted-foreground">Aceptaron (Sí)</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-destructive">{stats?.ethicsNo || 0}</p>
+                <p className="text-sm text-muted-foreground">No aceptaron (No)</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold">{stats?.voted || 0}</p>
+                <p className="text-sm text-muted-foreground">Total votantes</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Controls */}
         <Card className="mb-6">
