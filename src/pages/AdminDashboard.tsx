@@ -190,8 +190,25 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleResetVotes = async () => {
-    if (!confirm("¿Está seguro de reiniciar todos los votos? Esta acción no se puede deshacer.")) return;
+  const [showResetPinDialog, setShowResetPinDialog] = useState(false);
+  const [resetPin, setResetPin] = useState("");
+  const [resetPinError, setResetPinError] = useState("");
+
+  const RESET_PIN = "1234";
+
+  const handleResetVotes = () => {
+    setResetPin("");
+    setResetPinError("");
+    setShowResetPinDialog(true);
+  };
+
+  const confirmResetWithPin = async () => {
+    if (resetPin !== RESET_PIN) {
+      setResetPinError("PIN incorrecto. Intente de nuevo.");
+      setResetPin("");
+      return;
+    }
+    setShowResetPinDialog(false);
     try {
       await adminAction("reset-votes");
       toast({ title: "Éxito", description: "Votos reiniciados" });
