@@ -487,6 +487,34 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+      {/* Reset PIN Dialog */}
+      <Dialog open={showResetPinDialog} onOpenChange={setShowResetPinDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Reinicio de Votos</DialogTitle>
+            <DialogDescription>
+              Ingrese el PIN de 4 dígitos para confirmar el reinicio. Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <InputOTP maxLength={4} value={resetPin} onChange={(val) => { setResetPin(val); setResetPinError(""); }}>
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+              </InputOTPGroup>
+            </InputOTP>
+            {resetPinError && (
+              <p className="text-sm text-destructive font-medium">{resetPinError}</p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowResetPinDialog(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmResetWithPin} disabled={resetPin.length !== 4}>Confirmar Reinicio</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
